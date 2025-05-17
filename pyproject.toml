@@ -4,6 +4,13 @@ version = "0.1.0"
 description = "Add your description here"
 requires-python = ">=3.11"
 dependencies = [
+    "clearml>=1.18.0",
+    "grad-cam>=1.5.5",
+    "matplotlib>=3.10.3",
     "opencv-python>=4.11.0.86",
     "pillow>=11.2.1",
+    "tensorboard>=2.19.0",
+    "torch>=2.7.0",
+    "torchvision>=0.22.0",
+    "ultralytics>=8.3.137",
 ]

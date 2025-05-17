@@ -174,3 +174,13 @@ cython_debug/
 .pypirc
 
 .idea
+
+resized_backgrounds
+resized_tools
+generated_images
+runs
+yolo_labels
+*.pt
+hyp.yaml
+data.yaml
+classes.txt
