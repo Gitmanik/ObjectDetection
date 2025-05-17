@@ -63,7 +63,7 @@ print(f"Validation mAP50: {mAP50:.2f}%")
 
 # ---- Inference on 4 random test images ----
 best_model = YOLO('runs/tool_detector/weights/best.pt')
-test_images = list(TEST_DIR.glob('*.*'))
+test_images = list(TEST_DIR.glob('*.jpg')) + list(TEST_DIR.glob('*.png'))
 assert len(test_images) >= 4
 sample_imgs = random.sample(test_images, 4)
 
