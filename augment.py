@@ -1,7 +1,6 @@
 import os
 import random
 import uuid
-import json
 from PIL import Image, ImageEnhance
 import shutil
 
@@ -9,7 +8,6 @@ import shutil
 BACKGROUND_FOLDER = "resized_backgrounds"
 TOOLS_FOLDER = "raw_tools"
 OUTPUT_FOLDER = "generated_images"
-ANNOTATION_FOLDER = "annotations"
 YOLO_LABEL_FOLDER = "yolo_labels"
 
 # Parametry
@@ -19,11 +17,9 @@ SCALE_MAX = 0.3
 
 # Resetuj foldery
 shutil.rmtree(OUTPUT_FOLDER, ignore_errors=True)
-shutil.rmtree(ANNOTATION_FOLDER, ignore_errors=True)
 shutil.rmtree(YOLO_LABEL_FOLDER, ignore_errors=True)
 
 os.makedirs(OUTPUT_FOLDER, exist_ok=True)
-os.makedirs(ANNOTATION_FOLDER, exist_ok=True)
 os.makedirs(YOLO_LABEL_FOLDER, exist_ok=True)
 
 # Wczytaj obrazy
@@ -125,14 +121,6 @@ for i in range(NUM_IMAGES):
     image_uuid = str(uuid.uuid4())
     output_path = os.path.join(OUTPUT_FOLDER, f"{image_uuid}.png")
     bg.convert("RGB").save(output_path)
-
-    # JSON
-    json_path = os.path.join(ANNOTATION_FOLDER, f"{image_uuid}.json")
-    with open(json_path, "w") as f:
-        json.dump({
-            "image": f"{image_uuid}.png",
-            "annotations": annotations
-        }, f, indent=4)
 
     # YOLO TXT
     yolo_path = os.path.join(YOLO_LABEL_FOLDER, f"{image_uuid}.txt")
