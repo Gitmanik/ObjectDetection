@@ -1,7 +1,6 @@
 import random
 from pathlib import Path
 
-import yaml
 from ultralytics import YOLO
 from PIL import Image
 
@@ -15,6 +14,7 @@ LABEL_DIR = DATA_ROOT / "yolo_labels"
 TRAIN_DIR = IMG_DIR / "train"
 VAL_DIR = IMG_DIR / "val"
 TEST_DIR = IMG_DIR / "test"
+DATA_YAML = DATA_ROOT / "data.yaml"
 
 # Create ClearML task
 task = Task.init(
@@ -22,49 +22,6 @@ task = Task.init(
     task_name="YOLO Tool Detection",
     tags=["object detection", "yolov8"]
 )
-
-# Create splits if not exist (80/20 for train/val, reserve separate folder for test images)
-all_images = list(IMG_DIR.glob("*.jpg")) + list(IMG_DIR.glob("*.png"))
-if not TRAIN_DIR.exists():
-    TRAIN_DIR.mkdir(parents=True)
-    VAL_DIR.mkdir(parents=True)
-    TEST_DIR.mkdir(parents=True)
-    random.shuffle(all_images)
-
-    n_total = len(all_images)
-    n_val = int(0.2 * n_total)
-    # Use last 4 images as test
-    test_images = all_images[-4:]
-    train_val = all_images[:-4]
-    val_images = train_val[:n_val]
-    train_images = train_val[n_val:]
-
-    # Move images and labels
-    for img_path in train_images:
-        img_path.rename(TRAIN_DIR / img_path.name)
-        lbl = LABEL_DIR / (img_path.stem + ".txt")
-        if lbl.exists(): lbl.rename(TRAIN_DIR / lbl.name)
-    for img_path in val_images:
-        img_path.rename(VAL_DIR / img_path.name)
-        lbl = LABEL_DIR / (img_path.stem + ".txt")
-        if lbl.exists(): lbl.rename(VAL_DIR / lbl.name)
-    for img_path in test_images:
-        img_path.rename(TEST_DIR / img_path.name)
-        lbl = LABEL_DIR / (img_path.stem + ".txt")
-        if lbl.exists(): lbl.rename(TEST_DIR / lbl.name)
-
-
-with open('classes.txt') as f:
-    names = [line.rstrip() for line in f]
-
-# Create data.yaml for YOLO
-data_yaml = DATA_ROOT / "data.yaml"
-with open(data_yaml, 'w') as f:
-    yaml.dump({
-        'train': str(TRAIN_DIR),
-        'val': str(VAL_DIR),
-        'names': names,
-    }, f)
 
 hyp_params = {
     'lr0': 0.001,
@@ -78,7 +35,7 @@ task.connect(hyp_params)
 # ---- Train YOLOv8 Model ----
 model = YOLO('yolov8n.pt')
 model.train(
-    data=str(data_yaml),
+    data=str(DATA_YAML),
     epochs=50,
     imgsz=640,
     batch=16,
