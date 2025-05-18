@@ -16,6 +16,8 @@ VAL_DIR = IMG_DIR / "val"
 TEST_DIR = IMG_DIR / "test"
 DATA_YAML = DATA_ROOT / "data.yaml"
 
+TRAINED_NAME = "tool_detector3"
+
 def train():
     # Create ClearML task
     task = Task.init(
@@ -38,10 +40,10 @@ def train():
         data=str(DATA_YAML),
         epochs=50,
         imgsz=640,
-        batch=16,
+        batch=-1,
         project="runs",
-        name="tool_detector",
-        exist_ok=True,
+        name=TRAINED_NAME,
+        exist_ok=False,
         **hyp_params  # -> lr0, weight_decay, dropout
     )
 
@@ -65,10 +67,11 @@ def train():
 
     # Close the ClearML task
     task.close()
+    print("Task closed.")
 
 def test(task = None):
     # ---- Inference on 4 random test images ----
-    best_model = YOLO('runs/tool_detector/weights/best.pt')
+    best_model = YOLO(f'runs/{TRAINED_NAME}/weights/best.pt')
     test_images = list(TEST_DIR.glob('*.jpg')) + list(TEST_DIR.glob('*.png'))
     assert len(test_images) >= 4
     sample_imgs = random.sample(test_images, 4)
@@ -96,4 +99,5 @@ def test(task = None):
 
         print(f"Saved inference visualization: {out_path}")
 
+# train()
 test()
